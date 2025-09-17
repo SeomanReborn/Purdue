@@ -214,7 +214,7 @@ values = frequency_table.values
 
 # Create the bar plot
 plt.close()
-sns.barplot(x=labels, y=values, color='blue')
+sns.barplot(x=labels, y=values, colors='blue')
 plt.title("Bar Plot Example (seaborn)")
 plt.xlabel("Category")
 plt.ylabel("Value")

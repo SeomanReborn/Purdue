@@ -143,7 +143,7 @@ probs
 plot(probs~x, type='h')
 
 #P(between 3 and 6, inclusive, successes) =
-sum(probs[4:7])
+sum(probs[40:70])
 
 
 # Poisson distribution
@@ -151,7 +151,7 @@ sum(probs[4:7])
 ?dpois
 
 lambda=4
-
+alot = 30
 x=0:alot
 
 lambda^x*exp(-lambda)/factorial(x)
@@ -201,6 +201,7 @@ sigma=2
 
 # P(x <= 35) =
 pnorm(35, mean=mu, sd=sigma)    # needs sd, not var
+pnorm((35-mu)/sigma)
 
 # P(x > 41) =
 1 - pnorm(41, mu, sigma)
@@ -220,7 +221,7 @@ pnorm(spec2, mu, sigma) - pnorm(spec1, mu, sigma)
 mu=10
 sigma=sqrt(9)
 
-qnorm(.95, mu, sigma)
+qnorm(.95, mu, sigma) #Gives the value back base on probability
 
 
 # Getting the values in Figure 1.12
