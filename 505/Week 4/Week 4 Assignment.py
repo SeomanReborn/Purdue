@@ -45,3 +45,47 @@ stemgraphic.stem_graphic(temp, scale=10, leaf_order=True)
 plt.show()
 
 #Problem 1.F
+tempQuarts = np.quantile(temp, [.25, .75])
+print(tempQuarts)
+#124. 133.75
+
+#Problem 1.G
+plt.close()
+plt.boxplot(temp)
+plt.ylabel('Temp')
+plt.show()
+
+#Problem 1.H
+#Right Leaning. Has 2 outliers.
+
+#Problem 1.I
+plt.close()
+fig, ax = plt.subplots()
+res = probplot(temp, dist="norm")
+ax.scatter(res[0][0], res[0][1], label="Data Points")  # Scatter plot for octane data
+ax.plot(res[0][0], res[1][1] + res[1][0] * res[0][0], color="red", label="Q-Q Line")  # Reference line
+ax.set_title("Q-Q Plot with Data on X-axis")
+ax.set_ylabel("Sample Quantiles (Temp Data)")
+ax.set_xlabel("Theoretical Quantiles (Normal)")
+ax.legend()
+plt.show()
+#Yes. The data that isn't an outlier lay on the line for the most part.
+
+#Problem 2.A
+n = 3
+p = .15
+prob = geom.pmf(k=n, p=p)
+print(prob)
+#.108375
+
+#Problem 2.B
+#1/p or 6.6667 patients
+
+#Problem 2.C
+n = 50
+k = 10
+p = .15
+prob = binom.pmf(k,n,p)
+print(prob)
+#.088989
+
