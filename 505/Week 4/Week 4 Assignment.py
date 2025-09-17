@@ -89,3 +89,58 @@ prob = binom.pmf(k,n,p)
 print(prob)
 #.088989
 
+#Problem 3.A
+N = 25
+n = 5
+D = 2
+prob = hypergeom.pmf(0, N, D, n)
+print(prob)
+#.6333333
+
+#Problem 3.B
+p = D/N
+prob = binom.pmf(0, n, p)
+print(prob)
+#.65908. Yes it's probably fine, relatively close to the other one
+
+#Problem 3.C
+N=150
+p=D/N
+prob = hypergeom.pmf(0, N, D, n)
+print(prob)
+prob = binom.pmf(0, n, p)
+print(prob)
+#Yes! they are .934 and .935 respectively. it's even better.
+
+#Problem 3.D
+N = 25
+p = .95
+D = 5
+x = range(1, N+1)
+for n in x:
+  prob = hypergeom.pmf(0,N,D,n)
+  if 1-prob >= p:
+    print(n)
+    break
+#should sample 11 items.
+
+#Problem 4
+n = 1000
+p = .1
+x = range(0, n+1)
+prob = [poisson.pmf(k, p) for k in x]
+print(1-prob[0])
+#.09516
+
+#Problem 5
+u = 5000
+std = 50
+p = .005
+x = norm.ppf(p, loc = u, scale = std)
+print(x)
+#4871.2
+
+
+
+
+
