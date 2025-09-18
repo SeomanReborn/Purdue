@@ -45,7 +45,21 @@ siliconPpm = 'Silicon'
 sodium_ppm = 'Sodium'
 potasPpm = 'Potassium'
 fuelTypeExhaust = 'Fuel'
+
+#fuel types
 ulsd = '#2ULSD'
 b20 = 'B20'
 
-plt.plot(fuelecon[month], fuelecon[mpg], marker='o', linestyle='-', color='blue', label='Sample Line')
+ulsdMpg = fuelecon.loc[fuelecon[fuelTypeEcon]==ulsd]
+b20Mpg = fuelecon.loc[fuelecon[fuelTypeEcon]==b20]
+plt.close()
+plt.plot(ulsdMpg[month], ulsdMpg[mpg], marker='o', linestyle='-', color='blue', label=ulsd)
+plt.plot(b20Mpg[month], b20Mpg[mpg], marker='s', linestyle='--', color='red', label=b20)
+
+plt.xlabel('Month')
+plt.ylabel('Average MPG')
+plt.title('#2ULSD vs B20 Average Miles per Gallon')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
