@@ -140,7 +140,46 @@ x = norm.ppf(p, loc = u, scale = std)
 print(x)
 #4871.2
 
+#Problem 6.A
+rate = .1
+scale = 1/rate
+x = 48
+prob = expon.cdf(x, scale=scale)
+print(prob)
+#.99177
 
+#Problem 6.B
+x = 5
+prob = 1 - expon.cdf(x, scale=scale)
+print(prob)
+#.60653
 
+#Problem 7.A
+u = 100
+std = 2
+ll = 97
+ul = 102
+proportion = norm.cdf(ul, loc=u, scale=std) - norm.cdf(ll, loc=u, scale=std)
+print(proportion)
+#77.45%
 
+#Problem 7.B
+x = np.arange(0, 201, .01)
+llCost = [norm.cdf(ll, loc=k, scale=std) for k in x]
+ulCost = [(1 - norm.cdf(ul, loc=k, scale=std)) * 5 for k in x]
+table = pd.DataFrame({'llCost': llCost, 'ulCost': ulCost})
+sumTable = table['ulCost'] + table['llCost']
+minMean = sumTable.idxmin()/100
+print(minMean)
+#98.21 should minimize
 
+#Problem 8
+#using Normal Dist cause n is "large"
+p = 12/38
+n = 50
+u = n*p
+k = 12
+std = np.sqrt(u*(1-p))
+prob = 1 - norm.cdf(k, loc=u, scale=std)
+print(prob)
+#.87553
