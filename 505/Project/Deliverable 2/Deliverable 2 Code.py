@@ -23,6 +23,8 @@ exhaust = exhaust.iloc[1:].reset_index(drop=True)
 
 #rename Truck Col
 exhaust.rename(columns={'Unnamed: 0': 'Truck'}, inplace=True)
+exhaust.rename(columns={'Fuel': 'Fuel %'}, inplace=True)
+exhaust.rename(columns={'Fuel.1': 'Fuel Type'}, inplace=True)
 
 
 month = 'Month'
@@ -32,7 +34,7 @@ season = 'Season'
 
 truck = 'Truck'
 sample = 'Samp. #'
-fuelPct = 'Fuel'
+fuelPct = 'Fuel %'
 sootPct = 'Soot'
 visc = 'Visc'
 acidNum = 'Acid #'
@@ -47,7 +49,7 @@ alumPpm = 'Aluminum'
 siliconPpm = 'Silicon'
 sodium_ppm = 'Sodium'
 potasPpm = 'Potassium'
-fuelTypeExhaust = 'Fuel'
+fuelTypeExhaust = 'Fuel Type'
 
 #fuel types
 ulsd = '#2ULSD'
@@ -113,7 +115,7 @@ fig, axs = plt.subplots(2, 2, figsize=(8, 6))
 fig.suptitle('Seasonal Fuel Economy Comparison: ULSD vs B20', fontsize=16)
 
 
-# --- SPRING ---
+# SPRING
 axs[0, 0].plot(ulsdMpgSpring[month], ulsdMpgSpring[mpg], label='ULSD', linestyle='-', marker='o', color='blue')
 axs[0, 0].plot(b20MpgSpring[month], b20MpgSpring[mpg], label='B20', linestyle='--', marker='s', color='red')
 axs[0, 0].set_title('Spring')
@@ -121,14 +123,14 @@ axs[0, 0].set_ylabel('MPG')
 axs[0, 0].legend()
 axs[0, 0].grid(True)
 
-# --- SUMMER ---
+# SUMMER
 axs[0, 1].plot(ulsdMpgSummer[month], ulsdMpgSummer[mpg], label='ULSD', linestyle='-', marker='o', color='blue')
 axs[0, 1].plot(b20MpgSummer[month], b20MpgSummer[mpg], label='B20', linestyle='--', marker='s', color='red')
 axs[0, 1].set_title('Summer')
 axs[0, 1].legend()
 axs[0, 1].grid(True)
 
-# --- FALL ---
+# FALL
 axs[1, 0].plot(ulsdMpgFall[month], ulsdMpgFall[mpg], label='ULSD', linestyle='-', marker='o', color='blue')
 axs[1, 0].plot(b20MpgFall[month], b20MpgFall[mpg], label='B20', linestyle='--', marker='s', color='red')
 axs[1, 0].set_title('Fall')
@@ -137,7 +139,7 @@ axs[1, 0].set_ylabel('MPG')
 axs[1, 0].legend()
 axs[1, 0].grid(True)
 
-# --- WINTER ---
+# WINTER
 axs[1, 1].plot(ulsdMpgWinter[month], ulsdMpgWinter[mpg], label='ULSD', linestyle='-', marker='o', color='blue')
 axs[1, 1].plot(b20MpgWinter[month], b20MpgWinter[mpg], label='B20', linestyle='--', marker='s', color='red')
 axs[1, 1].set_title('Winter')
@@ -145,9 +147,87 @@ axs[1, 1].set_xlabel('Month')
 axs[1, 1].legend()
 axs[1, 1].grid(True)
 
-# Adjust layout
+
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
 
+ulsdExhaust = exhaust.loc[exhaust[fuelTypeExhaust]==ulsd]
+b20Exhaust = exhaust.loc[exhaust[fuelTypeExhaust]==b20]
+
+ulsdColPpmSum = ulsdExhaust.iloc[:, 9:17].sum()
+b20ColPpmSum = b20Exhaust.iloc[:, 9:17].sum()
+
+plt.close()
+comparison_table = pd.DataFrame({
+    'ULSD': ulsdColPpmSum,
+    'B20': b20ColPpmSum
+})
+
+# Plot the bar chart
+comparison_table.plot(kind='bar', figsize=(9, 6), color=['blue', 'red'])
+
+# Add labels and title
+plt.title('PPM Comparison: ULSD vs B20')
+plt.xlabel('Metal/Compound')
+plt.ylabel('Total PPM')
+plt.xticks(rotation=45)
+plt.grid(axis='y')
+plt.tight_layout()
+plt.legend()
+
+# Show the plot
+plt.show()
+
+ulsdPpmSum = ulsdColPpmSum.iloc[:].sum()
+b20PpmSum = b20ColPpmSum.iloc[:].sum()
+combined = pd.DataFrame({
+    'Fuel Type': ['#2ULSD', 'B20'],
+    'Total PPM': [ulsdPpmSum, b20PpmSum]
+})
+
+plt.close()
+combined.plot(x='Fuel Type', y='Total PPM', kind='bar', figsize=(2, 6), color=['blue', 'red'])
+
+# Add labels and title
+plt.title('PPM Comparison: ULSD Total vs B20 Total')
+plt.xlabel('Fuel Type')
+plt.ylabel('Total PPM')
+plt.xticks(rotation=45)
+plt.grid(axis='y')
+plt.tight_layout()
+plt.legend()
+
+# Show the plot
+plt.show()
 
 
+plt.close()
+fig, axs = plt.subplots(2, 2, figsize=(8, 6))
+fig.suptitle('Acid and Base Level Distributions by Fuel Type', fontsize=16)
+
+# --- Acid: ULSD ---
+axs[0, 0].boxplot(ulsdExhaust[acidNum].dropna())
+axs[0, 0].set_title('ULSD - Total Acid Number')
+axs[0, 0].set_ylabel('Acid Number')
+
+# --- Acid: B20 ---
+axs[0, 1].boxplot(b20Exhaust[acidNum].dropna())
+axs[0, 1].set_title('B20 - Total Acid Number')
+for ax in axs[0,:]:
+  ax.set_ylim(1, 6.5)
+# --- Base: ULSD ---
+axs[1, 0].boxplot(ulsdExhaust[baseNum].dropna())
+axs[1, 0].set_title('ULSD - Total Base Number')
+axs[1, 0].set_ylabel('Base Number')
+
+# --- Base: B20 ---
+axs[1, 1].boxplot(b20Exhaust[baseNum].dropna())
+axs[1, 1].set_title('B20 - Total Base Number')
+for ax in axs[1,:]:
+  ax.set_ylim(2, 9)
+# Layout
+for ax in axs.flat:
+    ax.grid(True)
+
+plt.tight_layout(rect=[0, 0, 1, 0.95])
+plt.show()
