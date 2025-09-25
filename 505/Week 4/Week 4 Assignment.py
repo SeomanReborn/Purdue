@@ -180,6 +180,6 @@ n = 50
 u = n*p
 k = 12
 std = np.sqrt(u*(1-p))
-prob = 1 - norm.cdf(k, loc=u, scale=std)
+prob = 1 - norm.cdf(k - .5, loc=u, scale=std)
 print(prob)
-#.87553
+#.87553...Should have been .90406
