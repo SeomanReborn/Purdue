@@ -2,8 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm # For lm() equivalent (see line 322)
 import pandas as pd
+import seaborn as sns
 from statsmodels.stats.anova import anova_lm # For anova() equivalent (see line 330)
 from statsmodels.formula.api import ols # For lm() equivalent (see line 339)
+import scipy.stats as stats
 from scipy.stats import hypergeom
 from scipy.stats import binom
 from scipy.stats import poisson
@@ -83,5 +85,82 @@ print(f"P:{p_stat:.2f} < Alpha:{alpha:.2f}?")
 #p is .44 so we fail to reject Null Hype. No significant mean difference.
 
 #Problem 4.A
+Flow = [125,125,125,125,125,125,160,160,160,160,160,160,200,200,200,200,200,200]
+Uniformity = [2.7,2.6,4.6,3.2,3,3.8,4.6,4.9,5,4.2,3.6,4.2,4.6,2.9,3.4,3.5,4.1,5.1]
+df = pd.DataFrame({'Flow': Flow, 'Uniformity': Uniformity})
+
+# Convert Flow to Category and Create Dummies
+df = pd.get_dummies(df, columns=['Flow'], drop_first=True) # Drops one category to avoid multicollinearity (similar to R’s default behavior with factors in linear regression).
+print(df.head())
+
+# Convert Dummy Variables to 1 and 0
+df['Flow_160'] = df['Flow_160'].astype(int)
+df['Flow_200'] = df['Flow_200'].astype(int)
 
 
+# Define the response variable and predictors
+X = df.drop(columns='Uniformity')  # Predictor variables
+y = df['Uniformity']               # Response variable
+
+# Add a constant to the predictors (intercept term)
+X = sm.add_constant(X)
+
+# Fit the linear regression model
+model = sm.OLS(y, X)
+results = model.fit()
+
+# Print the summary (similar to R's summary(lm(...)))
+print(results.summary())
+#F-Stat is .0534. So it's above .05 so we do not reject h0.So there is 
+#Not enough to conclude C2F6 Flow Rate significantly affects etch uniformity.
+
+#Problem 4.B
+plt.close()
+df = pd.DataFrame({'Flow': Flow, 'Uniformity': Uniformity})
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Flow', y='Uniformity', data=df)
+plt.title("Etch Uniformity by C₂F₆ Flow Rate")
+plt.xlabel("Flow Rate")
+plt.ylabel("Uniformity (%)")
+plt.show()
+#125. it has the lowest values of the 3.
+
+#Problem 4.C
+plt.close()
+stats.probplot(Uniformity, dist="norm", plot=plt)
+plt.title("Q-Q Plot of Uniformity")
+plt.xlabel("Quants")
+plt.ylabel("Sample Quants")
+plt.show()
+#Yes, looks close to normally distributed
+
+#Problem 5.A
+Strength = [160,171,175,182,184,181,188,193,195,200]
+PctHardwood = [10,15,15,20,20,20,25,25,28,30]
+df = pd.DataFrame({'PctHardwood': PctHardwood, 'Strength': Strength})
+df = pd.get_dummies(df, columns=['PctHardwood'], drop_first=True)
+model = ols('Strength ~ PctHardwood', data=df).fit() 
+model.params
+# y = 1.8786 * x + 143.82
+
+#Problem 5.B
+model.summary()
+#p is close to 0, so H0 is rejected and the Strength is related to amount
+#of Hardwood
+
+#Problem 5.C
+m = 1.8786
+b = 143.82
+line = [m * x + b for x in PctHardwood]
+plt.close()
+plt.scatter(PctHardwood, Strength, marker='o')
+plt.plot(PctHardwood, line, color='red')
+plt.title("% Hardwood vs Strength")
+plt.xlabel("% Hardwood")
+plt.ylabel("Strength")
+plt.show()
+
+#Problem 5.D
+#As the % of Hardwood goes up, the strength of it goes up in a linear way.
+#1% increase in HArdwood gives 1.88 Strength units
+#p value being very low confirms this relationship is significant
