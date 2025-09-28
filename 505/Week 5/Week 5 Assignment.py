@@ -51,9 +51,8 @@ plt.scatter(quants, lifetimesSorted)
 plt.plot(quants, quants, color='red', linestyle='--')  # reference line
 
 plt.title("QQ Plot of Battery Lifetimes")
-plt.xlabel("Theoretical Quantiles")
-plt.ylabel("Sample Quantiles")
-plt.grid(True)
+plt.xlabel("Quants")
+plt.ylabel("Sample Quants")
 plt.show()
 #Values are close to a straight line so they appear to be almsot normally distributed.
 #Therefore, t_test and confidence intervals can be used assuming they are normal.
