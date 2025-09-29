@@ -105,7 +105,7 @@ columns = ['Iron', 'Lead', 'Copper', 'Chro', 'Aluminum', 'Silicon', 'Sodium', 'P
 fig, axes = plt.subplots(3, 3, figsize=(9, 6))
 axes = axes.flatten()
 
-# Loop through each column and plot Q-Q of differences
+#Had AI help me with this loop to do everything all at once.
 for i, col in enumerate(columns):
     ulsd = pd.to_numeric(ulsdExhaust[col], errors='coerce').reset_index(drop=True)
     b20 = pd.to_numeric(b20Exhaust[col], errors='coerce').reset_index(drop=True)
@@ -120,7 +120,7 @@ for i, col in enumerate(columns):
     axes[i].set_xlabel("Theoretical Quants")
     axes[i].set_ylabel("Quants")
 
-# Hide unused subplot if fewer than 9
+
 if len(columns) < 9:
     fig.delaxes(axes[-1])
 
@@ -128,4 +128,79 @@ plt.tight_layout()
 plt.show()
 
 
+plt.close()
+ulsd_chro = pd.to_numeric(ulsdExhaust['Chro'], errors='coerce').dropna()
+b20_chro = pd.to_numeric(b20Exhaust['Chro'], errors='coerce').dropna()
+data = [ulsd_chro, b20_chro]
+plt.boxplot(data, labels=['#2ULSD', 'B20'], patch_artist=True)
+plt.title("Boxplot of Chromium (Chro) Levels")
+plt.ylabel("Concentration")
+plt.grid(True)
 
+plt.show()
+
+plt.close()
+acidColumns = [acidNum, baseNum]
+lines = {}
+summary = {}
+fuelTypeEx = exhaust.columns[17]
+#Had AI help me with this loop to do everything all at once.
+for col in columns:
+    try:
+        # Select relevant columns and drop missing values
+        df = exhaust[[col, acidNum, fuelTypeEx]].dropna()
+
+        # Convert Acid # to numeric
+        df[acidNum] = pd.to_numeric(df[acidNum], errors='coerce')
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+        df = df.dropna(subset=[acidNum, col])
+
+        # Encode fuel type
+        df['FuelLabel'] = df[fuelTypeEx].map({'#2ULSD': 'ULSD', 'B20': 'B20'})
+        df = pd.get_dummies(df, columns=['FuelLabel'], drop_first=True)
+
+        # Build formula dynamically
+        predictors = [f'Q("{acidNum}")']
+        if 'FuelLabel_B20' in df.columns:
+            predictors.append('Q("FuelLabel_B20")')
+
+        formula = f'Q("{col}") ~ ' + ' + '.join(predictors)
+
+        # Fit model and store parameters
+        model = ols(formula, data=df).fit()
+        lines[col] = model.params
+        summary[col] = model.summary()
+
+    except Exception as e:
+        print(f"Error processing column {col}: {e}")
+        
+print(lines)
+print(summary)
+
+lines = {}
+summary = {}
+fuelTypeEx = exhaust.columns[17]
+#Had AI help me with this loop to do everything all at once.
+for col in columns:
+    try:
+        df = exhaust[[col, baseNum, fuelTypeEx]].dropna()
+        df[baseNum] = pd.to_numeric(df[baseNum], errors='coerce')
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+        df = df.dropna(subset=[baseNum, col])
+        df['FuelLabel'] = df[fuelTypeEx].map({'#2ULSD': 'ULSD', 'B20': 'B20'})
+        df = pd.get_dummies(df, columns=['FuelLabel'], drop_first=True)
+        predictors = [f'Q("{baseNum}")']
+        if 'FuelLabel_B20' in df.columns:
+            predictors.append('Q("FuelLabel_B20")')
+
+        formula = f'Q("{col}") ~ ' + ' + '.join(predictors)
+
+        model = ols(formula, data=df).fit()
+        lines[col] = model.params
+        summary[col] = model.summary()
+
+    except Exception as e:
+        print(f"Error processing column {col}: {e}")
+        
+print(lines)
+print(summary)
